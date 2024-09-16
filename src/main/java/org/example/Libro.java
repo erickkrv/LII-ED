@@ -1,18 +1,24 @@
 package org.example;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class Libro{
     private long ISBN;
     private String titulo;
     private String autor;
     private String categoria;
-    private double precio;
+    private String precio;
     private int stock;
 
-    public Libro(long ISBN, String titulo, String autor, double precio, int stock) {
+    public Libro(long ISBN, String titulo, String autor, String categor, String precio, int stock) {
         this.ISBN = ISBN;
         this.titulo = titulo;
         this.autor = autor;
-        //this.categoria = categoria;
+        this.categoria = categor;
         this.precio = precio;
         this.stock = stock;
     }
@@ -35,10 +41,14 @@ public class Libro{
     public void setAutor(String autor) {
         this.autor = autor;
     }
-    public double getPrecio() {
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+    public String getPrecio() {
         return precio;
     }
-    public void setPrecio(double precio) {
+    public void setPrecio(String precio) {
         this.precio = precio;
     }
     public int getStock() {
