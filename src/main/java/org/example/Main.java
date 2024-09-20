@@ -16,39 +16,15 @@ import java.util.Scanner;
 public class Main {
     static public HashMap<String, Libro> HashLibros = new HashMap<String, Libro>();
     static public HashMap<String, String> HashNombres= new HashMap<String, String>();
+
+    private static int equalCounter = 0;
+    private static int decompressCounter = 0;
+    private static int huffmanCounter = 0;
+
+    private static int arithmeticCounter = 0;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while(true){
-            HuffmanTree huffmanTree = new HuffmanTree();
-            String mensaje = "Don Quijote de la Mancha";
-            // Codificar
-            ArithmeticCompression codificar = new ArithmeticCompression(mensaje);
-            var encoded = codificar.Compress(mensaje);
-            String comprimido = "";
-            for(byte b : encoded.toByteArray()){
-                comprimido += b;
-            }
-            // System.out.println("Mensaje codificado: " + comprimido);
-
-            ByteArrayInputStream input = new ByteArrayInputStream(encoded.toByteArray());
-            // Decodificar
-            var decoded = codificar.Decompress(input, mensaje.length());
-            System.out.println("Mensaje original: " + mensaje);
-            System.out.println("Mensaje decodificado Aritmetico: " + decoded);
-
-            huffmanTree.BuildTree(mensaje, null);
-            Pair<BitSet, Integer> encodedHuffman = huffmanTree.Encode(mensaje);
-            // var decodedHuffman = huffmanTree.Decode(encodedHuffman);
-            // System.out.println("Mensaje decodificado Huffman: " + decodedHuffman);
-
-            //Debug
-            System.out.println("Mensaje original: " + mensaje);
-            System.out.println("Mensaje codificado Huffman: " + HuffmanTree.bitSetToString(encodedHuffman.getKey(), encodedHuffman.getValue()));
-            System.out.println("Mensaje codificado aritmético: " + ArithmeticCompression.GetBinaryString(encoded));
-
-            // Calcular tamaño
-            calcularTamaño(mensaje, HuffmanTree.bitSetToString(encodedHuffman.getKey(), encodedHuffman.getValue()), ArithmeticCompression.GetBinaryString(encoded));
-
             System.out.println("Laboratorio 2 Erick Rivas");
             System.out.println("1. Importar CSV");
             System.out.println("2. Salir");
@@ -88,7 +64,7 @@ public class Main {
                 File archivoSeleccionado = archivo.getSelectedFile();
                 // Leer archivo
                 try (BufferedReader br = new BufferedReader(new FileReader(archivoSeleccionado));
-                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("libros_encontrados.txt", true)))) {
+                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("libros_encontrados.txt", false)))) {
                     String linea;
 
                     StringBuilder sb = new StringBuilder();
@@ -153,10 +129,27 @@ public class Main {
                             String isbnBuscado = HashNombres.get(nombreABuscar);
                             Libro libro = HashLibros.get(isbnBuscado);
                             if (libro != null) {
+                                libro.encodeNames();
                                 sb.append(libro.toString()).append("\n");
+                                int originalSize = libro.getOriginalSize();
+                                double huffmanSize = libro.getHuffmanSize() / 8.0;
+                                int arithmeticSize = libro.getArithmeticSize();
+                                if (originalSize == huffmanSize && originalSize == arithmeticSize) {
+                                    equalCounter++;
+                                } else if (originalSize <= huffmanSize && originalSize <= arithmeticSize) {
+                                    decompressCounter++;
+                                } else if (huffmanSize <= originalSize && huffmanSize <= arithmeticSize) {
+                                    huffmanCounter++;
+                                } else{
+                                    arithmeticCounter++;
+                                }
                             }
                         }
                     }
+                    sb.append("Equal: " + equalCounter + "\n");
+                    sb.append("Decompress: " + decompressCounter + "\n");
+                    sb.append("Huffman: " + huffmanCounter + "\n");
+                    sb.append("Arithmetic: " + arithmeticCounter + "\n");
                     writer.write(sb.toString());
                 }
                 System.out.println("CSV importado correctamente");
@@ -164,15 +157,5 @@ public class Main {
                 System.err.println("Error al importar los libros: " + e.getMessage() + " en la línea: " + ultimaLinea);
             }
         }
-    }
-    private static void calcularTamaño(String original, String comprimidoHuffman, String comprimidoAritmetico){
-        //Tamaño original en bytes (cada caracter ocupa 2 bytes)
-        int tamañoOriginal = original.length() * 2;
-        //Huffman en bits
-        int tamañoHuffman = comprimidoHuffman.length();
-        //Aritmético en bytes
-        int tamañoAritmetico = comprimidoAritmetico.length() / 8;
-
-        System.out.println("namesize: " + tamañoOriginal + " Huffman: " + tamañoHuffman + " Arithmetic: " + tamañoAritmetico);
     }
 }
