@@ -17,7 +17,23 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while(true){
-            System.out.println("Laboratorio 1 Erick Rivas");
+            String mensaje = "Me quiero matar AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+            // Codificar
+            ArithmeticCompression codificar = new ArithmeticCompression(mensaje);
+            var encoded = codificar.Compress(mensaje);
+            String comprimido = "";
+            for(byte b : encoded.toByteArray()){
+                comprimido += b;
+            }
+            // System.out.println("Mensaje codificado: " + comprimido);
+
+            ByteArrayInputStream input = new ByteArrayInputStream(encoded.toByteArray());
+            // Decodificar
+            var decoded = codificar.Decompress(input, mensaje.length());
+            System.out.println("Mensaje original: " + mensaje);
+            System.out.println("Mensaje decodificado: " + decoded);
+
+            System.out.println("Laboratorio 2 Erick Rivas");
             System.out.println("1. Importar CSV");
             System.out.println("2. Salir");
             System.out.println("Ingrese una opción: ");
