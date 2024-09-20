@@ -1,10 +1,12 @@
 package org.example;
 
+import javafx.util.Pair;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -17,7 +19,8 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while(true){
-            String mensaje = "Me quiero matar AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+            HuffmanTree huffmanTree = new HuffmanTree();
+            String mensaje = "Don Quijote de la Mancha";
             // Codificar
             ArithmeticCompression codificar = new ArithmeticCompression(mensaje);
             var encoded = codificar.Compress(mensaje);
@@ -31,7 +34,20 @@ public class Main {
             // Decodificar
             var decoded = codificar.Decompress(input, mensaje.length());
             System.out.println("Mensaje original: " + mensaje);
-            System.out.println("Mensaje decodificado: " + decoded);
+            System.out.println("Mensaje decodificado Aritmetico: " + decoded);
+
+            huffmanTree.BuildTree(mensaje, null);
+            Pair<BitSet, Integer> encodedHuffman = huffmanTree.Encode(mensaje);
+            // var decodedHuffman = huffmanTree.Decode(encodedHuffman);
+            // System.out.println("Mensaje decodificado Huffman: " + decodedHuffman);
+
+            //Debug
+            System.out.println("Mensaje original: " + mensaje);
+            System.out.println("Mensaje codificado Huffman: " + HuffmanTree.bitSetToString(encodedHuffman.getKey(), encodedHuffman.getValue()));
+            System.out.println("Mensaje codificado aritmético: " + ArithmeticCompression.GetBinaryString(encoded));
+
+            // Calcular tamaño
+            calcularTamaño(mensaje, HuffmanTree.bitSetToString(encodedHuffman.getKey(), encodedHuffman.getValue()), ArithmeticCompression.GetBinaryString(encoded));
 
             System.out.println("Laboratorio 2 Erick Rivas");
             System.out.println("1. Importar CSV");
@@ -148,5 +164,15 @@ public class Main {
                 System.err.println("Error al importar los libros: " + e.getMessage() + " en la línea: " + ultimaLinea);
             }
         }
+    }
+    private static void calcularTamaño(String original, String comprimidoHuffman, String comprimidoAritmetico){
+        //Tamaño original en bytes (cada caracter ocupa 2 bytes)
+        int tamañoOriginal = original.length() * 2;
+        //Huffman en bits
+        int tamañoHuffman = comprimidoHuffman.length();
+        //Aritmético en bytes
+        int tamañoAritmetico = comprimidoAritmetico.length() / 8;
+
+        System.out.println("namesize: " + tamañoOriginal + " Huffman: " + tamañoHuffman + " Arithmetic: " + tamañoAritmetico);
     }
 }

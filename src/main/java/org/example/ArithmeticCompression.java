@@ -139,16 +139,7 @@ public class ArithmeticCompression {
             String binaryStr = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
             binary.append(binaryStr);
         }
-        String combined = binary.toString();
-        StringBuilder formattedBinary = new StringBuilder();
-        for(int i = 0; i < combined.length(); i+=4){
-            if(i > 0){
-                formattedBinary.append("-");
-            }
-            //Unir cada grupo de 4
-            formattedBinary.append(combined, i, Math.min(i + 4, combined.length()));
-        }
-        return formattedBinary.toString();
+        return binary.toString();
     }
     public String Decompress(ByteArrayInputStream input, int size){
         char c;
