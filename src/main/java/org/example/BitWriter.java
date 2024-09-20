@@ -5,40 +5,50 @@ import java.io.IOException;
 
 public class BitWriter implements AutoCloseable {
     private ByteArrayOutputStream byteArrayOutputStream;
-    private byte _currentByte;
-    private int _bitPosition;
-    private boolean _disposed = false;
+    private byte currentByte;
+    private int bitPosition;
+    private boolean disposed = false;
 
     public BitWriter() {
         byteArrayOutputStream = new ByteArrayOutputStream();
-        _currentByte = 0;
-        _bitPosition = 7;
+        currentByte = 0;
+        bitPosition = 7;
     }
-    //Escribir solo un bit al ByteArrayOutputStream
-    public void WriteBit(boolean bit){
-        if(bit){
-            _currentByte |= (byte)(1 << _bitPosition);
+
+    // Write a single bit to the ByteArrayOutputStream
+    public void WriteBit(boolean bit) {
+        if (bit) {
+            currentByte |= (byte)(1 << bitPosition);
         }
-        _bitPosition--;
-        //Si llenamos un byte, escribirlo
-        if(_bitPosition < 0){
-            byteArrayOutputStream.write(_currentByte);
-            _currentByte = 0;
-            _bitPosition = 7;
+        bitPosition--;
+
+        // If we have filled a byte, write it to the ByteArrayOutputStream
+        if (bitPosition < 0) {
+            byteArrayOutputStream.write(currentByte);
+            currentByte = 0;
+            bitPosition = 7;
         }
     }
-    //Limpiar buffer y regresar al ByteArrayOutputStream
-    public byte[] Flush(){
-        if(_bitPosition < 7){
-           byteArrayOutputStream.write(_currentByte);
+
+    // Flush any remaining bits and return the ByteArrayOutputStream
+    public ByteArrayOutputStream Flush() {
+        if (bitPosition < 7) {
+            // Write the remaining bits as a byte
+            byteArrayOutputStream.write(currentByte);
         }
-        return byteArrayOutputStream.toByteArray();
+        return byteArrayOutputStream;
     }
+
+    // Dispose of the ByteArrayOutputStream
     @Override
-    public void close() throws IOException{
-        if(!_disposed){
-            byteArrayOutputStream.close();
-            _disposed = true;
+    public void close() {
+        if (!disposed) {
+            try {
+                byteArrayOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            disposed = true;
         }
     }
 }
