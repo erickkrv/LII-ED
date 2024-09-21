@@ -1,14 +1,11 @@
 package org.example;
 
-import javafx.util.Pair;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import java.util.BitSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
@@ -17,7 +14,7 @@ public class Main {
     //Creación de uin hashmap para guardar los libros
     static public HashMap<String, Libro> HashLibros = new HashMap<String, Libro>();
     //Creación de un hashmap para guardar los nombres de los libros y su isbn
-    static public HashMap<String, String> HashNombres= new HashMap<String, String>();
+    static public HashMap<String, String> nameISBNMap = new HashMap<String, String>();
 
     //Contadores para los tipos de compresión
     private static int equalCounter = 0;
@@ -90,16 +87,21 @@ public class Main {
                             );
                             // Agregar libro a HashMap
                             HashLibros.put(isbnActual, libro);
-                            HashNombres.put(json.getString("name"), isbnActual);
+                            nameISBNMap.put(json.getString("name"), isbnActual);
                         }
 
                         if (linea.startsWith("DELETE;")) {
                             String datos = linea.substring(7).trim();
                             JSONObject json = new JSONObject(datos);
                             String isbnActual = json.getString("isbn");
-                            // Eliminar libro de HashMap
-                            HashLibros.remove(isbnActual);
-                            HashNombres.remove(isbnActual);
+                            //Obtener nombre de libro a eliminar
+                            if(HashLibros.containsKey(isbnActual)){
+                                String nombreLibro = HashLibros.get(isbnActual).getTitulo();
+                                //Eliminar de HashMap de nombres
+                                nameISBNMap.remove(nombreLibro);
+                                //Eliminar de HashMap de libros
+                                HashLibros.remove(isbnActual);
+                            }
                         }
 
                         if (linea.startsWith("PATCH;")) {
@@ -110,8 +112,8 @@ public class Main {
                             // Actualizar libro
                             if (libro != null) {
                                 if (json.has("name")) {
-                                    HashNombres.remove(libro.getTitulo());
-                                    HashNombres.put(json.getString("name"), isbnActual);
+                                    nameISBNMap.remove(libro.getTitulo());
+                                    nameISBNMap.put(json.getString("name"), isbnActual);
                                     libro.setTitulo(json.getString("name"));
                                 }
                                 if (json.has("author")) {
@@ -133,7 +135,7 @@ public class Main {
                             String datos = linea.substring(7).trim();
                             JSONObject json = new JSONObject(datos);
                             String nombreABuscar = json.getString("name");
-                            String isbnBuscado = HashNombres.get(nombreABuscar);
+                            String isbnBuscado = nameISBNMap.get(nombreABuscar);
                             Libro libro = HashLibros.get(isbnBuscado);
                             if (libro != null) {
                                 //Si el libro no es nulo, se codifican los nombres
@@ -160,6 +162,8 @@ public class Main {
                     sb.append("Decompress: " + decompressCounter + "\n");
                     sb.append("Huffman: " + huffmanCounter + "\n");
                     sb.append("Arithmetic: " + arithmeticCounter + "\n");
+//                    System.out.println("Conteo mapa: " + HashLibros.size());
+//                    System.out.println("Conteo mapa: " + nameISBNMap.size());
                     writer.write(sb.toString());
                 }
                 System.out.println("CSV importado correctamente");
