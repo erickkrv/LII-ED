@@ -14,9 +14,12 @@ import java.util.Scanner;
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
+    //Creación de uin hashmap para guardar los libros
     static public HashMap<String, Libro> HashLibros = new HashMap<String, Libro>();
+    //Creación de un hashmap para guardar los nombres de los libros y su isbn
     static public HashMap<String, String> HashNombres= new HashMap<String, String>();
 
+    //Contadores para los tipos de compresión
     private static int equalCounter = 0;
     private static int decompressCounter = 0;
     private static int huffmanCounter = 0;
@@ -67,10 +70,11 @@ public class Main {
                      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("libros_encontrados.txt", false)))) {
                     String linea;
 
+                    // Leer archivo línea por línea
                     StringBuilder sb = new StringBuilder();
                     while ((linea = br.readLine()) != null) {
                         ultimaLinea = linea;
-
+                        // Procesar línea
                         if (linea.startsWith("INSERT;")) {
                             String datos = linea.substring(7).trim();
                             JSONObject json = new JSONObject(datos);
@@ -84,6 +88,7 @@ public class Main {
                                     json.getString("price"),
                                     json.getInt("quantity")
                             );
+                            // Agregar libro a HashMap
                             HashLibros.put(isbnActual, libro);
                             HashNombres.put(json.getString("name"), isbnActual);
                         }
@@ -92,6 +97,7 @@ public class Main {
                             String datos = linea.substring(7).trim();
                             JSONObject json = new JSONObject(datos);
                             String isbnActual = json.getString("isbn");
+                            // Eliminar libro de HashMap
                             HashLibros.remove(isbnActual);
                             HashNombres.remove(isbnActual);
                         }
@@ -101,6 +107,7 @@ public class Main {
                             JSONObject json = new JSONObject(datos);
                             String isbnActual = json.getString("isbn");
                             Libro libro = HashLibros.get(isbnActual);
+                            // Actualizar libro
                             if (libro != null) {
                                 if (json.has("name")) {
                                     HashNombres.remove(libro.getTitulo());
@@ -121,7 +128,7 @@ public class Main {
                                 }
                             }
                         }
-
+                        //Buscar libro
                         if (linea.startsWith("SEARCH;")) {
                             String datos = linea.substring(7).trim();
                             JSONObject json = new JSONObject(datos);
@@ -129,8 +136,10 @@ public class Main {
                             String isbnBuscado = HashNombres.get(nombreABuscar);
                             Libro libro = HashLibros.get(isbnBuscado);
                             if (libro != null) {
+                                //Si el libro no es nulo, se codifican los nombres
                                 libro.encodeNames();
                                 sb.append(libro.toString()).append("\n");
+                                //Se comparan los tamaños de los nombres
                                 int originalSize = libro.getOriginalSize();
                                 double huffmanSize = libro.getHuffmanSize() / 8.0;
                                 int arithmeticSize = libro.getArithmeticSize();
@@ -146,6 +155,7 @@ public class Main {
                             }
                         }
                     }
+                    //Al finalizar, se escribe en el archivo de salida los contadores
                     sb.append("Equal: " + equalCounter + "\n");
                     sb.append("Decompress: " + decompressCounter + "\n");
                     sb.append("Huffman: " + huffmanCounter + "\n");

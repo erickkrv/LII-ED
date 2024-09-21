@@ -4,6 +4,7 @@ public class Range {
     public double low;
     public double high;
 
+    // Constructor
     public Range(double low, double high) {
         this.low = low;
         this.high = high;

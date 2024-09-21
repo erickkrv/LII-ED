@@ -64,6 +64,7 @@ public class Libro{
         this.stock = stock;
     }
 
+    //Método para codificar el nombre del libro en Huffman y en Arithmetic
     public void encodeNames(){
         HuffmanTree arbol = new HuffmanTree();
         arbol.BuildTree(this.titulo, null);
