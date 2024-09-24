@@ -75,20 +75,49 @@ public class Main {
                         if (linea.startsWith("INSERT;")) {
                             String datos = linea.substring(7).trim();
                             JSONObject json = new JSONObject(datos);
+
+                            // Verificación de campos obligatorios (isbn y name)
+                            if (!json.has("isbn") || json.getString("isbn").isEmpty()) {
+                                throw new IllegalArgumentException("Error: Falta el ISBN del libro.");
+                            }
+                            if (!json.has("name") || json.getString("name").isEmpty()) {
+                                throw new IllegalArgumentException("Error: Falta el nombre del libro.");
+                            }
+
+                            // Obtener valores del JSON, verificando si están presentes y no vacíos
                             String isbnActual = json.getString("isbn");
-                            // Crear libro
+
+                            String author = json.has("author") && !json.getString("author").isEmpty()
+                                    ? json.getString("author")
+                                    : null;
+
+                            String category = json.has("category") && !json.getString("category").isEmpty()
+                                    ? json.getString("category")
+                                    : null;
+
+                            String price = json.has("price") && !json.getString("price").isEmpty()
+                                    ? json.getString("price")
+                                    : null;
+
+                            Integer quantity = json.has("quantity") && !json.isNull("quantity")
+                                    ? json.getInt("quantity")
+                                    : null;
+
+                            // Crear libro solo si los campos obligatorios están presentes
                             Libro libro = new Libro(
                                     json.getLong("isbn"),
                                     json.getString("name"),
-                                    json.getString("author"),
-                                    json.getString("category"),
-                                    json.getString("price"),
-                                    json.getInt("quantity")
+                                    author,
+                                    category,
+                                    price,
+                                    quantity
                             );
+
                             // Agregar libro a HashMap
                             HashLibros.put(isbnActual, libro);
                             nameISBNMap.put(json.getString("name"), isbnActual);
                         }
+
 
                         if (linea.startsWith("DELETE;")) {
                             String datos = linea.substring(7).trim();
