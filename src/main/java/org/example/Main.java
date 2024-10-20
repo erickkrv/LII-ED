@@ -5,6 +5,10 @@ import org.json.JSONObject;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -17,11 +21,11 @@ public class Main {
     static public HashMap<String, String> nameISBNMap = new HashMap<String, String>();
 
     //Contadores para los tipos de compresión
-    private static int equalCounter = 0;
-    private static int decompressCounter = 0;
-    private static int huffmanCounter = 0;
-
-    private static int arithmeticCounter = 0;
+//    private static int equalCounter = 0;
+//    private static int decompressCounter = 0;
+//    private static int huffmanCounter = 0;
+//
+//    private static int arithmeticCounter = 0;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while(true){
@@ -166,39 +170,57 @@ public class Main {
                             String nombreABuscar = json.getString("name");
                             String isbnBuscado = nameISBNMap.get(nombreABuscar);
                             Libro libro = HashLibros.get(isbnBuscado);
-                            if (libro != null) {
-                                //Si el libro no es nulo, se codifican los nombres
-                                libro.encodeNames();
-                                sb.append(libro.toString()).append("\n");
-                                //Se comparan los tamaños de los nombres
-                                int originalSize = libro.getOriginalSize();
-                                double huffmanSize = libro.getHuffmanSize() / 8.0;
-                                int arithmeticSize = libro.getArithmeticSize();
-                                if (originalSize == huffmanSize && originalSize == arithmeticSize) {
-                                    equalCounter++;
-                                } else if (originalSize <= huffmanSize && originalSize <= arithmeticSize) {
-                                    decompressCounter++;
-                                } else if (huffmanSize <= originalSize && huffmanSize <= arithmeticSize) {
-                                    huffmanCounter++;
-                                } else{
-                                    arithmeticCounter++;
-                                }
+                            if(libro != null){
+                                sb.append(libro.toString()).append("\r\n");
                             }
                         }
                     }
-                    //Al finalizar, se escribe en el archivo de salida los contadores
-                    sb.append("Equal: " + equalCounter + "\n");
-                    sb.append("Decompress: " + decompressCounter + "\n");
-                    sb.append("Huffman: " + huffmanCounter + "\n");
-                    sb.append("Arithmetic: " + arithmeticCounter + "\n");
-//                    System.out.println("Conteo mapa: " + HashLibros.size());
-//                    System.out.println("Conteo mapa: " + nameISBNMap.size());
                     writer.write(sb.toString());
                 }
                 System.out.println("CSV importado correctamente");
+                Path path = Path.of("libros_encontrados.txt");
+                try{
+                    String contenido = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                    if(!contenido.trim().isEmpty()){
+                        System.out.println("Búsqueda detectada! Encriptando resultado...");
+                        encriptarDES();
+                        System.out.println("Resultado encriptado correctamente");
+                    }
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
             } catch (Exception e) {
                 System.err.println("Error al importar los libros: " + e.getMessage() + " en la línea: " + ultimaLinea);
             }
         }
+    }
+    //Método para encriptar
+    private static void encriptarDES(){
+        //Llave de encriptación
+        String key = "ok:uo1IN";
+        //Convertir la llave a bytes
+        var bytesKey = key.getBytes();
+        String data = "";
+        //Leer el archivo de texto
+        Path path = Path.of("libros_encontrados.txt");
+        try{
+            //Convierte el contenido del archivo a un string.
+            data = Files.readString(path, StandardCharsets.UTF_8);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        //Convertir el texto a bytes
+        byte[] bytesData = data.getBytes();
+        //Encriptar el texto
+        byte[] encryptedData = DES.encriptar(bytesData, bytesKey, true);
+
+        // Guardar el texto cifrado en un archivo
+        try{
+            Files.write(Path.of("encriptado.enc"), encryptedData);
+            System.out.println("El resultado cifrado se ha escrito en encriptado.enc");
+        }catch(IOException e){
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        }
+
     }
 }
