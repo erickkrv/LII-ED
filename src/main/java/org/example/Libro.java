@@ -17,8 +17,8 @@ public class Libro{
     private String precio;
     private int stock;
 
-    private String encodedNameHuffman;
-    private String encodedNameArithmetic;
+//    private String encodedNameHuffman;
+//    private String encodedNameArithmetic;
 
     public Libro(long ISBN, String titulo, String autor, String categor, String precio, int stock) {
         this.ISBN = ISBN;
@@ -65,29 +65,29 @@ public class Libro{
     }
 
     //Método para codificar el nombre del libro en Huffman y en Arithmetic
-    public void encodeNames(){
-        HuffmanTree arbol = new HuffmanTree();
-        arbol.BuildTree(this.titulo, null);
-        Pair<BitSet, Integer> encoded = arbol.Encode(this.titulo);
-        this.encodedNameHuffman = HuffmanTree.bitSetToString(encoded.getKey(), encoded.getValue());
-
-        ArithmeticCompression arithmeticCompression = new ArithmeticCompression(this.titulo);
-        var encodedArithmetic = arithmeticCompression.Compress(this.titulo);
-        this.encodedNameArithmetic = ArithmeticCompression.GetBinaryString(encodedArithmetic);
-    }
-    public int getOriginalSize(){
-        return this.titulo.length() * 2;
-    }
-    public int getHuffmanSize(){
-        return this.encodedNameHuffman.length();
-    }
-    public int getArithmeticSize(){
-        return this.encodedNameArithmetic.length() / 8;
-    }
+//    public void encodeNames(){
+//        HuffmanTree arbol = new HuffmanTree();
+//        arbol.BuildTree(this.titulo, null);
+//        Pair<BitSet, Integer> encoded = arbol.Encode(this.titulo);
+//        this.encodedNameHuffman = HuffmanTree.bitSetToString(encoded.getKey(), encoded.getValue());
+//
+//        ArithmeticCompression arithmeticCompression = new ArithmeticCompression(this.titulo);
+//        var encodedArithmetic = arithmeticCompression.Compress(this.titulo);
+//        this.encodedNameArithmetic = ArithmeticCompression.GetBinaryString(encodedArithmetic);
+//    }
+//    public int getOriginalSize(){
+//        return this.titulo.length() * 2;
+//    }
+//    public int getHuffmanSize(){
+//        return this.encodedNameHuffman.length();
+//    }
+//    public int getArithmeticSize(){
+//        return this.encodedNameArithmetic.length() / 8;
+//    }
     //Método toString
     @Override
     public String toString() {
         return "{\"isbn\":"  + "\"" + ISBN + "\"" + ",\"name\":" + "\"" + titulo +"\"" + ",\"author\":" + "\"" + autor + "\"" +
-                ",\"category\":" + "\"" + categoria + "\"" + ",\"price\":" + "\"" + precio + "\"" + ",\"quantity\":" + "\"" + stock + "\"" + ",\"namesize\":" + "\"" + getOriginalSize() + "\"" + ",\"namesizehuffman\":" + "\"" + getHuffmanSize() + "\"" + ",\"namesizearithmetic\":" + "\"" + getArithmeticSize() + "\"}";
+                ",\"category\":" + "\"" + categoria + "\"" + ",\"price\":" + "\"" + precio + "\"" + ",\"quantity\":" + "\"" + stock + "\"}";
     }
 }
