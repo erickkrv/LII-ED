@@ -29,7 +29,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while(true){
-            System.out.println("Laboratorio 2 Erick Rivas");
+            System.out.println("Laboratorio 4 Erick Rivas");
             System.out.println("1. Importar CSV");
             System.out.println("2. Salir");
             System.out.println("Ingrese una opción: ");
